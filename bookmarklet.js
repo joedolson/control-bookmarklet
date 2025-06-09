@@ -27,7 +27,7 @@ javascript:(function () {
     }
     document.getElementsByTagName('head')[0].appendChild(style);
 
-    const nodes = document.querySelectorAll("a,button,div[role=button],summary,input[type=submit],input[type=button]");
+    const nodes = document.querySelectorAll("a,button,div[role=button],input[type=submit],input[type=button]");
     
     for (const element in nodes) {
         if ( ! isNaN(element) ) {
