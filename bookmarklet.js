@@ -17,8 +17,10 @@ javascript:(function () {
         return;
     }
 
-    let css = '.bookmarklet-added { outline: 2px solid #060; outline-offset: 1px; }.checked-bookmarklet > li { font-style: normal; font-weight: 400;margin: 6px; padding: 0; max-width: 100%; text-align: left; background: transparent; text-transform: none;}.checked-bookmarklet { position: fixed !important; text-shadow: none; font-family: sans-serif;position:absolute; left: anchor(left) !important; top: anchor(bottom) !important; z-index: 10000; list-style-type: square; background: #fff !important; color: #333 !important; border: 2px solid #900; padding: 3px !important; border-radius: 3px; width: max-content !important; max-width: 20em; font-size: 14px !important; margin: 0 !important; }';
     let style = document.createElement('style');
+    let css = '.bookmarklet-added { outline: 2px solid #060 !important; outline-offset: 1px !important; }';
+    css += '.checked-bookmarklet > li { font-style: normal; display: list-item!important; font-weight: 400;margin: 6px; padding: 0; max-width: 100%; text-align: left; background: transparent; text-transform: none;}';
+    css += '.checked-bookmarklet { position: fixed !important; text-shadow: none; font-family: sans-serif; left: anchor(left) !important; top: anchor(bottom) !important; z-index: 10000; list-style-type: square !important; background: #fff !important; color: #333 !important; border: 2px solid #900; padding: 3px 3px 3px 12px!important; border-radius: 3px; width: max-content !important; max-width: 20em; font-size: 14px !important; margin: 0 !important; }';
     
     if (style.styleSheet) {
         style.styleSheet.cssText = css;
@@ -38,14 +40,25 @@ javascript:(function () {
                 pseudoElement.setAttribute( 'id', popoverId );
                 pseudoElement.style.positionAnchor = '--' + popoverId;
                 pseudoElement.className = 'checked-bookmarklet';
-                let el = '`' + nodes[element].nodeName + '`';
 
+                let el = '`' + nodes[element].nodeName + '`';
                 let role = nodes[element].getAttribute('role');
-                let innerText = nodes[element].innerText;
-                if ( 'INPUT' === el ) {
+                let innerText;
+                console.log( el );
+                if ( 'INPUT' === nodes[element].nodeName ) {
                     innerText = nodes[element].getAttribute( 'value' );
                 } else {
-                   innerText = ( ! innerText ) ? 'None' : innerText;
+                    innerText = nodes[element].innerText;
+                    innerText = ( ! innerText ) ? 'None' : innerText;
+                }
+                let svgContents = nodes[element].querySelectorAll( 'svg' );
+                if ( svgContents ) {
+                    if ( innerText === 'None' ) {
+                        innerText = '';
+                    }
+                    svgContents.forEach( (svg) => {
+                        innerText += ( innerText !== '' ) ? ', ' + svg.textContent : svg.textContent;
+                    });
                 }
                 let ariaLabel = ( nodes[element].hasAttribute( 'aria-label' ) ) ? nodes[element].getAttribute( 'aria-label' ) : false;
                 let ariaDesc = ( nodes[element].hasAttribute( 'aria-describedby' ) ) ? nodes[element].getAttribute( 'aria-describedby' ) : false;
