@@ -20,8 +20,8 @@ javascript:(function () {
     let style = document.createElement('style');
     let css = '.bookmarklet-added { outline: 2px solid #060 !important; outline-offset: 1px !important; }';
     css += '.checked-bookmarklet > ul li { font-style: normal; display: list-item!important; font-weight: 400;margin: 6px; padding: 0; max-width: 100%; text-align: left; background: transparent; text-transform: none;}';
-    css += '.checked-bookmarklet > ul { display: block !important; list-style-type: square !important; }';
-    css += '.checked-bookmarklet { position: fixed !important; text-shadow: none; font-family: sans-serif; left: anchor(left) !important; top: anchor(bottom) !important; position-try-fallbacks: flip-start;z-index: 10000; background: #fff !important; color: #333 !important; border: 2px solid #900; padding: 3px 3px 3px 12px!important; border-radius: 3px; width: max-content !important; max-width: 20em; font-size: 14px !important; margin: 0 !important; }';
+    css += '.checked-bookmarklet > ul { display: block !important; list-style-type: square !important; padding: 3px 3px 3px 12px!important; margin: 0 !important; }';
+    css += '.checked-bookmarklet { position: fixed !important; margin: 0 !important; text-shadow: none; font-family: sans-serif; left: anchor(left) !important; top: anchor(bottom) !important; position-try-fallbacks: flip-start;z-index: 10000; background: #fff !important; color: #333 !important; border: 2px solid #900; border-radius: 3px; width: max-content !important; max-width: 20em; font-size: 14px !important; }';
     css += '.checked-bookmarklet:popover-open { display: block !important; }';
     if (style.styleSheet) {
         style.styleSheet.cssText = css;
