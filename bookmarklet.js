@@ -19,8 +19,9 @@ javascript:(function () {
 
     let style = document.createElement('style');
     let css = '.bookmarklet-added { outline: 2px solid #060 !important; outline-offset: 1px !important; }';
-    css += '.checked-bookmarklet > ul li { font-style: normal; display: list-item!important; font-weight: 400;margin: 6px; padding: 0; max-width: 100%; text-align: left; background: transparent; text-transform: none;}';
-    css += '.checked-bookmarklet > ul { display: block !important; list-style-type: square !important; padding: 3px 3px 3px 12px!important; margin: 0 !important; }';
+    css += '.bookmarklet-mismatch { outline: 4px solid #900 !important; }';
+    css += '.checked-bookmarklet > ul li { white-space: wrap !important; height: auto! important; font-style: normal; float: none !important; line-height: 1.5 !important; display: list-item!important; font-weight: 400;margin: 6px; padding: 0; max-width: 100%; text-align: left; background: transparent; text-transform: none;}';
+    css += '.checked-bookmarklet > ul { display: block !important; position: relative !important; list-style-type: square !important; padding: 3px 3px 3px 12px!important; margin: 0 !important; }';
     css += '.checked-bookmarklet { position: fixed !important; margin: 0 !important; text-shadow: none; font-family: sans-serif; left: anchor(left) !important; top: anchor(bottom) !important; position-try-fallbacks: flip-start;z-index: 10000; background: #fff !important; color: #333 !important; border: 2px solid #900; border-radius: 3px; width: max-content !important; max-width: 20em; font-size: 14px !important; }';
     css += '.checked-bookmarklet:popover-open { display: block !important; }';
     if (style.styleSheet) {
@@ -49,22 +50,9 @@ javascript:(function () {
                 if ( 'INPUT' === nodes[element].nodeName ) {
                     innerText = nodes[element].getAttribute( 'value' );
                 } else {
-                    innerText = nodes[element].innerText;
-                    innerText = ( ! innerText || '' === innerText ) ? 'None' : innerText;
+                    innerText = elHasText(nodes[element]);
                 }
-                let svgContents = nodes[element].querySelectorAll( 'svg' );
-                if ( svgContents ) {
-                    if ( innerText === 'None' ) {
-                        innerText = '';
-                    }
-                    svgContents.forEach( (svg) => {
-                        innerText += ( svg.hasAttribute( 'aria-label' ) ) ? svg.getAttribute( 'aria-label' ) : '';
-                        innerText += ( innerText !== '' ) ? ', ' + svg.textContent : svg.textContent;
-                    });
-                    if ( innerText === '' ) {
-                        innerText = 'None';
-                    }
-                }
+                innerText = ( '' === innerText ) ? 'None' : innerText;
                 let ariaLabel = ( nodes[element].hasAttribute( 'aria-label' ) ) ? nodes[element].getAttribute( 'aria-label' ) : false;
                 let ariaDesc = ( nodes[element].hasAttribute( 'aria-describedby' ) ) ? nodes[element].getAttribute( 'aria-describedby' ) : false;
                 let ariaLabelledBy = ( nodes[element].hasAttribute( 'aria-labelledby' ) ) ? nodes[element].getAttribute( 'aria-labelledby' ) : false;
@@ -97,6 +85,9 @@ javascript:(function () {
                 popover.insertAdjacentElement( 'afterBegin', pseudoElement );
                 nodes[element].after(popover);
                 nodes[element].classList.add( 'bookmarklet-added' );
+                if ( role === 'button' && el !== 'BUTTON' || role === 'link' && el !== 'A' || innerText === 'None' ) {
+                    nodes[element].classList.add( 'bookmarklet-mismatch' );
+                }
                 nodes[element].style.anchorName = '--' + popoverId;
                 nodes[element].setAttribute( 'position-anchor', '--' + popoverId );
                 ['mouseover','mouseout','focus','blur'].forEach( (eventType) => {
@@ -108,6 +99,26 @@ javascript:(function () {
             }
         }
     }
+
+    function elHasText(el) {
+        let text = '';
+        if ( (el.nodeType === 3) || (el.nodeType === 4) ) {
+            text = el.nodeValue;
+        } else if ( (el.nodeType === 1) && (
+                (el.tagName.toLowerCase() == 'img') ||
+                (el.tagName.toLowerCase() == 'area') ||
+                ((el.tagName.toLowerCase() == 'input') && el.getAttribute('type') && (el.getAttribute('type').toLowerCase() == 'image'))
+                ) ) {
+            text = el.getAttribute('alt') || '';
+        } else if ( (el.nodeType === 1) && !el.tagName.match(/^(script|style)$/i) ) {
+            let children = el.childNodes;
+            for (let i = 0, l = children.length; i < l; i++) {
+                let ariaLabel = el.getAttribute( 'aria-label' );
+                text += ( ariaLabel ) ? ariaLabel : elHasText( children[i] ) + ' ';
+            }
+        }
+        return text;
+    };
 
     function addListNode( el, label, value ) {
         let listItem = document.createElement( 'li' );
